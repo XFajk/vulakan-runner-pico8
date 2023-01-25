@@ -2,11 +2,17 @@ pico-8 cartridge // http://www.pico-8.com
 version 39
 __lua__
 function _init()
+
 	coin_i={1,gen_anim({16,17,18,19},{4,3,3,3})}
+	ply=player(50,50)
+	
 end
 
 function _update()
-
+	
+	ply:update()
+	
+	-- coin animation logic
 	if coin_i[1] < #coin_i[2]then
 		coin_i[1]+=1
 	else
@@ -34,6 +40,8 @@ function _draw()
 		end
 	end
 	-- end drawing of the map
+	
+	ply:draw()
 	
 	rect(0,0,127,127,7)
 end
@@ -78,17 +86,24 @@ end
 -->8
 -- objects
 
-function player()
+function player(x,y)
 	return {
-		box=box(40,40,7,7),
+		box=box(x,y,7,7),
 		sp=1,
+		gravity=0,
+		force=0.5,
 		
 		update=function(self)
-		
+			
+			
+			self.gravity += self.force
+			self.box.y1 += self.gravity
+			
+			self.box:update()
 		end,
 		
 		draw=function(self)
-			
+			spr(self.sp,self.box.x1,self.box.y1)
 		end
 	}
 end
