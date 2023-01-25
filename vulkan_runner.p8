@@ -90,15 +90,36 @@ function player(x,y)
 	return {
 		box=box(x,y,7,7),
 		sp=1,
+		x_vel=0,
+		vs=0.25,
+		max_vel=2,
 		gravity=0,
 		force=0.5,
 		
 		update=function(self)
+			if btn(0) then
+				if self.x_vel > -self.max_vel then
+					self.x_vel-=self.vs
+				end
+			else
+				if self.x_vel < 0 then
+					self.x_vel+=self.vs
+				end
+			end
 			
-			
+			if btn(1) then
+				if self.x_vel < self.max_vel then
+					self.x_vel+=self.vs
+				end
+			else
+				if self.x_vel > 0 then
+					self.x_vel-=self.vs
+				end
+			end
+		
 			self.gravity += self.force
 			self.box.y1 += self.gravity
-			
+			self.box.x1 += self.x_vel
 			self.box:update()
 		end,
 		
