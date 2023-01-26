@@ -155,6 +155,7 @@ function player(x,y)
 		max_vel=2,
 		force=0.5,
 		jumped=false,
+		djumped=true,
 		air⧗=0,
 		
 		--animation logic
@@ -166,6 +167,7 @@ function player(x,y)
 		},
 		mode="idle",
 		facing=false,
+		pars={},
 		
 		update=function(self,plat)
 		
@@ -182,13 +184,22 @@ function player(x,y)
 			if btn(4) and not self.jumped then
 				if self.air⧗ < 10 then
 					self.jumped=true
-					self.force = -3.75
+					self.djumped=false
+					self.force = -4.75
 					self.mode="jump"
+				end
+			elseif btn(4) and self.jumped and not self.djumped then
+				if self.force > 0 then
+					self.djumped=true
+					self.force=-3
+					for i=0,5 do
+						add(self.pars,{{self.box.x2-3,self.box.y2},{(rnd(20)-10)/5,(rnd(10))/5},4,7})
+					end
 				end
 			end
 		
 			self.vel[2] += self.force
-			self.force+=0.25
+			self.force+=0.5
 			if self.force>7 then
 				self.force=7
 			end
@@ -222,7 +233,9 @@ function player(x,y)
 			if self.anim_i<#self.anims[self.mode]-1 and self.mode~="jump"then
 				self.anim_i+=1
 			elseif self.mode=="jump" then
-				if self.force<0 then
+				if self.djumped then
+					self.anim_i=2
+				elseif self.force<0 then
 					self.anim_i=0
 				elseif self.force==0then
 					self.anim_i=1
@@ -238,16 +251,26 @@ function player(x,y)
 				self.facing=true
 			end
 			spr(self.anims[self.mode][self.anim_i+1],self.box.x1-scroll[1],self.box.y1,1,1,self.facing,false)
+			-- particle logic
+			for i,p in pairs(self.pars) do
+				p[1][1]+=p[2][1]
+				p[1][2]+=p[2][2]
+				p[3]-=0.5
+				circfill(p[1][1]-scroll[1],p[1][2],p[3],p[4])
+				if p[3] <= 0 then
+					self.pars[i]=nil
+				end
+			end
 		end
 	}
 end
 __gfx__
 80000008444444444444444400000000000000004444444444444444000000004444444444444444444444444444444400000000000000000000000000000000
-0800008044f4fff444444444444444444444444444f4fff444f4fff44444444444f4fff444f45f5444f45f5444f4fff400000000000000000000000000000000
-008008004fff5f5044f45f5444f4fff444f4fff44fff5f504fff5f5044f4fff44fff5f504ffffff04fff5f504ffffff000000000000000000000000000000000
-000080000ffffff04fff5f504fff5f504fff5f540ffffff00ffffff04fff5f500ffffff00ffffff00fff5f500fff5f5000000000000000000000000000000000
-0008000000dddd000ffffff00ffffff04fff5f5000dddd0000dddd000ffffff000dddd0000dddd0000dddd0000dddd0000000000000000000000000000000000
-008008000077770000dddd0000dddd00006666000077770000777700006666000077770000777700007777000077770000000000000000000000000000000000
+0800008044f4fff444444444444444444444444444f4fff444f4fff44444444444f4fff444f41f1444f41f1444f4fff400000000000000000000000000000000
+008008004fff1f1044f41f1444f4fff444f4fff44fff1f104fff1f1044f4fff44fff1f104ffffff04fff1f104ffffff000000000000000000000000000000000
+000080000ffffff04fff1f104fff1f104fff1f140ffffff00ffffff04fff1f100ffffff00ffffff00fff1f100fff1f1000000000000000000000000000000000
+00080000006666000ffffff00ffffff04fff1f1000666600006666000ffffff00066660000666600006666000066660000000000000000000000000000000000
+00800800007777000066660000666600006666000077770000777700006666000077770000777700007777000077770000000000000000000000000000000000
 08000080007777000077770000777700007777000077771000777710017777000177770000777700007777000077770000000000000000000000000000000000
 80000008001001000010010000100100001001000010000001000000000000100000010000010010000100100001001000000000000000000000000000000000
 00aaaa0000aaaa0000aaaa0000aaaa00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
