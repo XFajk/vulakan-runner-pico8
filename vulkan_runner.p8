@@ -7,14 +7,14 @@ function _init()
 	ply=player(0,50)
 	plat={}
 	
-	scroll={0,0}
+	scr={0,0}
 	
 end
 
 function _update()
 	
 	ply:update(plat)
-	scroll[1]+=(ply.box.x1-scroll[1]-68)/10
+	scr[1]+=(ply.box.x1-scr[1]-68)/10
 	
 	-- coin animation logic
 	if coin_i[1] < #coin_i[2]then
@@ -37,24 +37,24 @@ function _draw()
 			c_block=mget(x,y)
 			if c_block ~= 0 then
 				if c_block == 162 then
-					spr(coin_i[2][coin_i[1]],x*8-scroll[1],y*8-1)
+					spr(coin_i[2][coin_i[1]],x*8-scr[1],y*8-1)
 				else
-					spr(c_block,x*8-scroll[1],y*8)
-					add(plat,box(x*8,y*8,7,7))
+					spr(c_block,x*8-scr[1],y*8)
+					add(plat,█(x*8,y*8,7,7))
 				end
 			end
 		end
 	end
 	-- end drawing of the map
 	
-	ply:draw(scroll)
+	ply:draw(scr)
 	
 	rect(0,0,127,127,7)
 end
 -->8
 -- helper functions
 
-function box(x,y,w,h)
+function █(x,y,w,h)
 	return {
 		x1=x,
 		y1=y,
@@ -78,28 +78,28 @@ function coll(a,b)
 	return true
 end
 
-function gen_anim(frames,duration)
+function gen_anim(frms,dur)
 	
-	anim_frames={}
-	for i,frame in pairs(frames) do
-		for j=1,duration[i] do
-			add(anim_frames,frame)
+	anim_frms={}
+	for i,frm in pairs(frms) do
+		for j=1,dur[i] do
+			add(anim_frms,frm)
 		end
 	end
 	
-	return anim_frames
+	return anim_frms
 end
 
 function coll_test(box,tiles)
-	hit_list={}
+	hit_l={}
 	
 	for i,tile in pairs(tiles) do
 		if coll(box, tile) then
-			add(hit_list,tile)
+			add(hit_l,tile)
 		end
 	end
 	
-	return hit_list
+	return hit_l
 	
 end
 
@@ -149,7 +149,7 @@ end
 
 function player(x,y)
 	return {
-		box=box(x,y,7,7),
+		box=█(x,y,7,7),
 		vel={0,0},
 		vs=0.25,
 		max_vel=2,
@@ -168,6 +168,8 @@ function player(x,y)
 		mode="idle",
 		facing=false,
 		pars={},
+		inp_pars={},
+		walk⧗=time(),
 		
 		update=function(self,plat)
 		
@@ -182,7 +184,8 @@ function player(x,y)
 			end
 			
 			if btn(4) and not self.jumped then
-				if self.air⧗ < 10 then
+				if self.air⧗ < 6 then
+					sfx(3)
 					self.jumped=true
 					self.djumped=false
 					self.force = -4.75
@@ -192,6 +195,7 @@ function player(x,y)
 				if self.force > 0 then
 					self.djumped=true
 					self.force=-3
+					sfx(2)
 					for i=0,5 do
 						add(self.pars,{{self.box.x2-3,self.box.y2},{(rnd(20)-10)/5,(rnd(10))/5},4,7})
 					end
@@ -210,11 +214,18 @@ function player(x,y)
 				self.mode="walk"
 			end
 			
+			-- sound logic
+			
 			-- collision logic
 			self.box,col=move(self.box,self.vel,plat)
 			
 			if col.bottom then
 				self.force=0
+				if self.air⧗ > 25 then
+					for i=0,5 do
+						add(self.inp_pars,{{self.box.x2-3,self.box.y2},{(rnd(20)-10)/5,(rnd(10)-10)/8},2,7})
+					end
+				end
 				self.jumped=false
 				self.air⧗=0
 			else
@@ -223,6 +234,13 @@ function player(x,y)
 			
 			if col.top then
 				self.force=1
+			end
+			
+			-- sound logic
+			if time()-self.walk⧗ > 0.2 and col.bottom and self.mode=="walk" then 
+				sfx(1) 
+					add(self.inp_pars,{{self.box.x2-(self.facing==true and 0 or 8),self.box.y2},{(rnd(10)*(self.facing==true and -1 or 1))/10,(rnd(10)-10)/5},3,7})
+				self.walk⧗=time()	
 			end
 			
 			self.box:update()
@@ -251,6 +269,7 @@ function player(x,y)
 				self.facing=true
 			end
 			spr(self.anims[self.mode][self.anim_i+1],self.box.x1-scroll[1],self.box.y1,1,1,self.facing,false)
+			
 			-- particle logic
 			for i,p in pairs(self.pars) do
 				p[1][1]+=p[2][1]
@@ -259,6 +278,17 @@ function player(x,y)
 				circfill(p[1][1]-scroll[1],p[1][2],p[3],p[4])
 				if p[3] <= 0 then
 					self.pars[i]=nil
+				end
+			end
+			
+			for i,p in pairs(self.inp_pars) do
+				p[1][1]+=p[2][1]
+				p[1][2]+=p[2][2]
+				p[2][2]+=0.1
+				p[3]-=0.1
+				circfill(p[1][1]-scroll[1],p[1][2],p[3],p[4])
+				if p[3] <= 0 then
+					self.inp_pars[i]=nil
 				end
 			end
 		end
@@ -412,7 +442,9 @@ __map__
 9494909490949294949294949492929494949494949494949400000000949494909400000000000094949494940000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 00020000000000c0500d050000000f05012050000001505017050190501d050200502b050341502e1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-010200000c630080200561003210016100e6101860000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000200000c630080200561003210016100e6101860000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000200000505004040037400573007030097300e0200f710150101f30021300243002530026300293003830000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0002000001360013500234004340073300a3300e320123201832025300313003a3002e3001b300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __music__
 00 41404344
 
