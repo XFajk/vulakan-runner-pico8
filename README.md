@@ -13,4 +13,7 @@ a infinite runner game
 <img src="vulkan_runner_2.gif" alt="cant load"/>
 <p>added a particles when you move and when you fall after a long jump and added a sound effects</p>
 
+<h1>4. test</h1>
+<img src="vulkan_runner_3.gif" alt="cant load"/>
+<p>added a coin collection system and a kill system then smoothed up the eye animation and expanded the test level</p>
 
