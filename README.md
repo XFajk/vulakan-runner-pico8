@@ -17,3 +17,8 @@ a infinite runner game
 <img src="vulkan_runner_3.gif" alt="cant load"/>
 <p>added a coin collection system and a kill system then smoothed up the eye animation and expanded the test level</p>
 
+<h1>5. test</h1>
+<h2>random generation alpha</h2>
+<img src="vulkan_runner_4.gif" alt="cant load"/>
+<p>added a system to appednd the game map with platforms</p>
+
