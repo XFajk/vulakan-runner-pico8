@@ -22,3 +22,6 @@ a infinite runner game
 <img src="vulkan_runner_4.gif" alt="cant load"/>
 <p>added a system to appednd the game map with platforms</p>
 
+<h2>random generation alpha 2</h2>
+<img src="vulkan_runner_5.gif" alt="cant load"/>
+<p>the platforms are randomized by the width between them and by the height so the player can jump on each one aka the platform generation is done now I need to add coins a death pit to the randomly genrated map</p>
